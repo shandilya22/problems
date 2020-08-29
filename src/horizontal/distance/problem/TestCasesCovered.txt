@@ -1,0 +1,25 @@
+#Below test cases have been covered:-
+
+1. Binary tree given in assignment doc. Distance b/w node 7 and 1.
+	O/p :- 2
+	
+2. Binary tree given in assignment doc. Distance b/w node 9 and 4.
+	O/p :- 5
+	
+3. Full binary tree with 15 nodes and each node having 2 children. Nodes are inserted in order:-(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15). Distance b/w 8 and 15(i.e extreme left child and extreme right child)
+	O/p:- 6
+	
+4. Left skewed binary tree with 10 nodes. Nodes are inserted in order:- (1,2,3,4,5,6,7,8,9,10). (No two nodes will be on same level)
+	O/p:-Nodes are not on same level
+	
+5. Right skewed binary tree with 10 nodes. Nodes are inserted in order:- (1,2,3,4,5,6,7,8,9,10). (No two nodes will be on same level)
+	O/p:-Nodes are not on same level
+	
+6. Binary tree given in assignment doc. Distance b/w node 10(which doesn't exist) and 4.
+	O/p:- Either of the node doesn't exist in binary tree
+	
+7. Binary tree with only one node i.e root node. Distance b/w node 2 and 3. (Node doesn't exist)
+	O/p:-Either of the node doesn't exist in binary tree
+	
+8. Binary tree given in assignment doc. Distance b/w same node i.e 7 and 7.
+	O/p:- Both the given nodes are same
