@@ -1,0 +1,212 @@
+#Problem link:-
+
+https://www.hackerrank.com/challenges/self-balancing-tree/problem
+
+#Solution:-
+
+static Node insert(Node root, int val) {
+        Node newNode = new Node();
+        newNode.val   = val;
+        newNode.ht    = 0;
+        newNode.left  = null;
+        newNode.right = null;
+        
+        if (!isDuplicate(root, newNode.val)) {
+            root = insertData(root, newNode, root);
+        }
+        return root;
+    }
+    
+    static Node insertData(Node root, Node newNode, Node mainRoot) {
+        if (root.left == null && root.right == null) {
+            if (newNode.val > root.val) {
+                root.right = newNode;
+            } else if (newNode.val < root.val) {
+                root.left = newNode;
+            }
+        } else {
+            if (newNode.val > root.val) {
+                if (root.right != null) {
+                    insertData(root.right, newNode, mainRoot);
+                } else {
+                    root.right = newNode;
+                }
+            } else if (newNode.val < root.val) {
+                if (root.left != null) {
+                    insertData(root.left, newNode, mainRoot);
+                } else {
+                    root.left = newNode;
+                }
+            }
+        }
+        
+        root.ht = heightOfNode(root);
+        
+        if (balanceFactor(root) > 1) {
+            root = balanceNode(root, newNode.val, mainRoot);
+        }
+        return root;
+    }
+    
+    static int heightOfNode(Node root) {
+        if (root == null) {
+            return -1;
+        } else if (root.left == null && root.right == null) {
+            return 0;
+        }
+        return 1 + Math.max(heightOfNode(root.left), heightOfNode(root.right));
+    }
+    
+    static Node balanceNode(Node imbalancedNode, int newNodeValue, Node root) {
+        // left - right
+        if (imbalancedNode.left != null && imbalancedNode.left.right != null && imbalancedNode.val > newNodeValue
+                && imbalancedNode.left.val < newNodeValue) {
+            // rotate left
+            rotateLeft(imbalancedNode, newNodeValue, root);
+            imbalancedNode.left.ht      = heightOfNode(imbalancedNode.left);
+            imbalancedNode.left.left.ht = heightOfNode(imbalancedNode.left.left);
+            root                        = balanceNode(imbalancedNode, newNodeValue, root);
+        }
+        // left - left
+        else if (imbalancedNode.left != null && imbalancedNode.left.left != null && imbalancedNode.val > newNodeValue
+                && imbalancedNode.left.val >= newNodeValue) {
+            Node left    = imbalancedNode.left;
+            Node newRoot = rotateRight(imbalancedNode, newNodeValue, root);
+            imbalancedNode.ht = heightOfNode(imbalancedNode);
+            left.ht           = heightOfNode(left);
+            if (newRoot != null) {
+                root = newRoot;
+            }
+        }
+        // right -left
+        else if (imbalancedNode.right != null && imbalancedNode.right.left != null && imbalancedNode.val < newNodeValue
+                && imbalancedNode.right.val > newNodeValue) {
+            rotateRight(imbalancedNode, newNodeValue, root);
+            imbalancedNode.right.ht       = heightOfNode(imbalancedNode.right);
+            imbalancedNode.right.right.ht = heightOfNode(imbalancedNode.right.right);
+            root                          = balanceNode(imbalancedNode, newNodeValue, root);
+        }
+        // right -right
+        else if (imbalancedNode.right != null && imbalancedNode.right.right != null && imbalancedNode.val < newNodeValue
+                && imbalancedNode.right.val <= newNodeValue) {
+            Node right   = imbalancedNode.right;
+            Node newRoot = rotateLeft(imbalancedNode, newNodeValue, root);
+            imbalancedNode.ht = heightOfNode(imbalancedNode);
+            right.ht          = heightOfNode(right);
+            if (newRoot != null) {
+                root = newRoot;
+            }
+        }
+        return root;
+    }
+    
+    static Node rotateLeft(Node imbalancedNode, int newNodeValue, Node root) {
+        if (imbalancedNode != null) {
+            Node lChild = null;
+            // left-right
+            if (imbalancedNode.left != null && imbalancedNode.val > newNodeValue
+                    && imbalancedNode.left.val < newNodeValue) {
+                lChild                         = imbalancedNode.left.right.left;
+                imbalancedNode.left.right.left = imbalancedNode.left;
+                imbalancedNode.left            = imbalancedNode.left.right;
+                imbalancedNode.left.left.right = lChild;
+            }
+            // right-right
+            else if (imbalancedNode.right != null && imbalancedNode.val < newNodeValue
+                    && imbalancedNode.right.val <= newNodeValue) {
+                Node parent = parentNode(imbalancedNode, root);
+                Node right  = imbalancedNode.right;
+                lChild                    = imbalancedNode.right.left;
+                imbalancedNode.right.left = imbalancedNode;
+                imbalancedNode.right      = lChild;
+                if (parent != null) {
+                    if (parent.val < imbalancedNode.val) {
+                        parent.right = right;
+                    } else {
+                        parent.left = right;
+                    }
+                } else {
+                    return right;
+                }
+            }
+        }
+        return null;
+    }
+    
+    static Node rotateRight(Node imbalancedNode, int newNodeValue, Node root) {
+        if (imbalancedNode != null) {
+            Node rChild = null;
+            // right-left
+            if (imbalancedNode.right != null && imbalancedNode.val < newNodeValue
+                    && imbalancedNode.right.val > newNodeValue) {
+                rChild                          = imbalancedNode.right.left.right;
+                imbalancedNode.right.left.right = imbalancedNode.right;
+                imbalancedNode.right            = imbalancedNode.right.left;
+                imbalancedNode.right.right.left = rChild;
+            }
+            // left-left
+            else if (imbalancedNode.left != null && imbalancedNode.val > newNodeValue
+                    && imbalancedNode.left.val >= newNodeValue) {
+                rChild = imbalancedNode.left.right;
+                Node parent = parentNode(imbalancedNode, root);
+                Node left   = imbalancedNode.left;
+                imbalancedNode.left.right = imbalancedNode;
+                imbalancedNode.left       = rChild;
+                if (parent != null) {
+                    if (parent.val > imbalancedNode.val) {
+                        parent.left = left;
+                    } else {
+                        parent.right = left;
+                    }
+                } else {
+                    return left;
+                }
+            }
+        }
+        return null;
+    }
+    
+    static int balanceFactor(Node node) {
+        int balanceFactor = heightOfNode(node.left) - heightOfNode(node.right);
+        return balanceFactor <= -1 ? -balanceFactor : balanceFactor;
+    }
+    
+    static Node parentNode(Node node, Node root) {
+        if (root != null) {
+            if ((root.left != null && root.left.val == node.val)
+                    || (root.right != null && root.right.val == node.val)) {
+                return root;
+            }
+            
+            if (root.left != null) {
+                Node parentNode = parentNode(node, root.left);
+                if (parentNode != null) {
+                    return parentNode;
+                }
+            }
+            if (root.right != null) {
+                Node parentNode = parentNode(node, root.right);
+                if (parentNode != null) {
+                    return parentNode;
+                }
+            }
+        }
+        return null;
+    }
+    
+    static boolean isDuplicate(Node root, int newNodeValue) {
+        if (root.val == newNodeValue) {
+            return true;
+        }
+        if (root.left != null && root.val > newNodeValue) {
+            if (isDuplicate(root.left, newNodeValue)) {
+                return true;
+            }
+        }
+        if (root.right != null && root.val < newNodeValue) {
+            if (isDuplicate(root.right, newNodeValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
