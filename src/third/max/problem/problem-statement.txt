@@ -1,0 +1,1 @@
+Find 3rd max in a 1d- integer array
